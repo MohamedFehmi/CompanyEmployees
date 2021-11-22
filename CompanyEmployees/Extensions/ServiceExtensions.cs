@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using Contracts;
+using LoggerService;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -22,5 +24,9 @@ namespace CompanyEmployees.Extensions
         {
             //Default values, for properties inside options, are fine for now
         });
+
+        //ConfigureLoggerService with AddScoped<ILoggerManager, LoggerManager>
+        public static void ConfigureLoggerService(this IServiceCollection services) => 
+            services.AddScoped<ILoggerManager, LoggerManager>();
     }
 }
