@@ -18,21 +18,31 @@ namespace CompanyEmployees.Controllers
         };
 
         private ILoggerManager _logger;
-
-        public WeatherForecastController(ILoggerManager logger)
+        private readonly IRepositoryManager _repository;
+        public WeatherForecastController(ILoggerManager logger, IRepositoryManager repository)
         {
             _logger = logger;
+            _repository = repository;
         }
+
 
         [HttpGet]
         public IEnumerable<WeatherForecast> Get()
         {
             var rng = new Random();
 
-            _logger.LogInfo("Info message from WeatherForecast controller");
-            _logger.LogDebug("Debug message from WeatherForecast controller");
-            _logger.LogWarn("Warn message from WeatherForecast controller");
-            _logger.LogError("Error message from WeatherForecast controller");
+            //Example of logging
+            //_logger.LogInfo("Info message from WeatherForecast controller");
+            //_logger.LogDebug("Debug message from WeatherForecast controller");
+            //_logger.LogWarn("Warn message from WeatherForecast controller");
+            //_logger.LogError("Error message from WeatherForecast controller");
+
+            var result = _repository.Company.FindAll(true);
+
+            foreach (var item in result)
+            {
+                Console.WriteLine($"Company {item.Name} at {item.Address}");
+            }
 
             return Enumerable.Range(1, 5).Select(index => new WeatherForecast
             {
