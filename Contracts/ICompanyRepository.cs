@@ -9,5 +9,7 @@ namespace Contracts
 {
     public interface ICompanyRepository : IRepositoryBase<Company>
     {
+        //new method to get all companies
+        IEnumerable<Company> GetAllCompanies(bool trackChanges);
     }
 }
