@@ -9,5 +9,7 @@ namespace Contracts
 {
     public interface IEmployeeRepository : IRepositoryBase<Employee>
     {
+        IEnumerable<Employee> GetEmployees(Guid companyId, bool trackChanges = false);
+        Employee GetEmployee(Guid companyId, Guid employeeId, bool trackChanges = false);
     }
 }

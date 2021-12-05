@@ -29,8 +29,8 @@ namespace CompanyEmployees.Extensions
 
                         await context.Response.WriteAsync(new ErrorDetails()
                         { 
-                          StatusCode = context.Response.StatusCode,
-                          Message = "Internal Server Error."
+                            StatusCode = context.Response.StatusCode,
+                            Message = "Internal Server Error."
                         }.ToString());
                     }
                 });

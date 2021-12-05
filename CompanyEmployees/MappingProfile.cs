@@ -9,6 +9,8 @@ namespace Entities.DataTransferObjects
         {
             CreateMap<Company, CompanyDTO>()
               .ForMember(c => c.FullAddress, opt => opt.MapFrom(x => string.Join(' ', x.Address, x.Country)));
+
+            CreateMap<Employee, EmployeeDTO>();
         }
     }
 }

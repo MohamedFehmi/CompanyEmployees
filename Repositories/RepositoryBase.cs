@@ -25,10 +25,10 @@ namespace Repositories
 
         public void Delete(T entity) => RepositoryContext.Set<T>().Remove(entity);
 
-        public IQueryable<T> FindAll(bool trackChanges) => 
+        public IQueryable<T> FindAll(bool trackChanges = false) => 
             !trackChanges ? RepositoryContext.Set<T>().AsNoTracking() : RepositoryContext.Set<T>();
 
-        public IQueryable<T> FindByCondition(Expression<Func<T, bool>> expression, bool trackChanges) =>
+        public IQueryable<T> FindByCondition(Expression<Func<T, bool>> expression, bool trackChanges = false) =>
             !trackChanges ? RepositoryContext.Set<T>().Where(expression).AsNoTracking() : RepositoryContext.Set<T>().Where(expression);
     }
 }

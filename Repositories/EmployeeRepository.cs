@@ -13,5 +13,13 @@ namespace Repositories
         public EmployeeRepository(RepositoryContext repositoryContext) : base(repositoryContext)
         {
         }
+
+        public Employee GetEmployee(Guid companyId, Guid employeeId, bool trackChanges = false) =>
+            FindByCondition(e => e.CompanyID.Equals(companyId) && e.EmployeeID.Equals(employeeId))
+            .FirstOrDefault();
+
+        public IEnumerable<Employee> GetEmployees(Guid companyId, bool trackChanges) =>
+            FindByCondition(e => e.CompanyID.Equals(companyId), trackChanges)
+            .OrderBy(e => e.Name);
     }
 }
