@@ -14,6 +14,12 @@ namespace Repositories
         {
         }
 
+        public void CreateEmployeeForCompany(Guid companyId, Employee employee) 
+        {
+            employee.CompanyID = companyId;
+            Create(employee);
+        }
+
         public Employee GetEmployee(Guid companyId, Guid employeeId, bool trackChanges = false) =>
             FindByCondition(e => e.CompanyID.Equals(companyId) && e.EmployeeID.Equals(employeeId))
             .FirstOrDefault();

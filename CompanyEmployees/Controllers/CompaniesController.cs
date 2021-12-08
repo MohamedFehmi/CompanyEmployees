@@ -37,7 +37,7 @@ namespace CompanyEmployees.Controllers
             return Ok(companiesDto);
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{id}", Name ="CompanyById")]
         public IActionResult GetCompany(Guid id)
         {
             var company = _repository.Company.GetCompany(id);
@@ -50,6 +50,25 @@ namespace CompanyEmployees.Controllers
 
             _logger.LogInfo($"Company with the specified id: {id} can not be found.");
             return NotFound();
+        }
+
+        [HttpPost]
+        public IActionResult CreateCompany([FromBody] CompanyCreateDTO companyCreateDto)
+        {
+            if (companyCreateDto == null)
+            {
+                _logger.LogError($"The object companyCreateDto is not valid");
+                return BadRequest($"Company can not be creted because of invalid data.");
+            }
+
+            var company = _mapper.Map<Company>(companyCreateDto);
+
+            _repository.Company.Create(company);
+            _repository.Save();
+
+            var companyDtoToReturn = _mapper.Map<CompanyDTO>(company);
+
+            return CreatedAtRoute("CompanyById", new { id = companyDtoToReturn.CompanyID }, companyDtoToReturn);
         }
     }
 }

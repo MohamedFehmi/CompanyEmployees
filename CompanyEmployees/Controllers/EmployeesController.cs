@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Contracts;
 using Entities.DataTransferObjects;
+using Entities.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -42,7 +43,7 @@ namespace CompanyEmployees.Controllers
             return Ok(employeesDto);
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{id}", Name = "GetEmployeeForCompany")]
         public IActionResult GetEmployeeForCompany(Guid companyId, Guid id)
         {
             var company = _repository.Company.GetCompany(companyId);
@@ -62,6 +63,32 @@ namespace CompanyEmployees.Controllers
             var employeeDto = _mapper.Map<EmployeeDTO>(employee);
             
             return Ok(employeeDto);
-        } 
+        }
+
+        [HttpPost]
+        public IActionResult CreateEmployeeForCompany(Guid companyId, [FromBody] EmployeeCreateDTO employeeCreateDTO)
+        {
+            if (employeeCreateDTO == null)
+            {
+                _logger.LogError($"The object employeeCreateDTO is not valid");
+                return BadRequest($"Employee for company id {companyId} can not be creted because of invalid employee data.");
+            }
+
+            //check if company actually exists
+            var company = _repository.Company.GetCompany(companyId);
+            if (company == null)
+            {
+                _logger.LogInfo($"Company with the id: {companyId} can not be found.");
+                return NotFound();
+            }
+
+            var employee = _mapper.Map<Employee>(employeeCreateDTO);
+            
+            _repository.Employee.CreateEmployeeForCompany(companyId, employee);
+            _repository.Save();
+
+            var employeeToReturnDto = _mapper.Map<EmployeeDTO>(employee);
+            return CreatedAtRoute("GetEmployeeForCompany", new { companyId, id = employeeToReturnDto.EmployeeID }, employeeToReturnDto);
+        }
     }
 }
