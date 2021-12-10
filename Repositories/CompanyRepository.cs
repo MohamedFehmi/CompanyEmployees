@@ -14,8 +14,6 @@ namespace Repositories
         {
         }
 
-        public void CreateCompany(Company company) => Create(company);
-
         public IEnumerable<Company> GetAllCompanies(bool trackChanges) =>
             FindAll(trackChanges)
             .OrderBy(c => c.Name)
@@ -28,5 +26,9 @@ namespace Repositories
         public Company GetCompany(Guid companyId, bool trackChanges) =>
             FindByCondition(c => c.CompanyID.Equals(companyId))
             .FirstOrDefault();
+
+        public void CreateCompany(Company company) => Create(company);
+
+        public void DeleteCompany(Company company) => Delete(company);
     }
 }

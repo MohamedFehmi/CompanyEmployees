@@ -117,5 +117,21 @@ namespace CompanyEmployees.Controllers
 
             return CreatedAtRoute("CompanyCollection", new { ids }, companyDTOs);
         }
+
+        [HttpDelete("{id}")]
+        public IActionResult DeleteCompany(Guid id)
+        {
+            var company = _repository.Company.GetCompany(id);
+            if (company == null)
+            {
+                _logger.LogInfo($"A company with the given id: {id} cannot be found.");
+                return NotFound();
+            }
+
+            _repository.Company.DeleteCompany(company);
+            _repository.Save();
+
+            return NoContent();
+        }
     }
 }

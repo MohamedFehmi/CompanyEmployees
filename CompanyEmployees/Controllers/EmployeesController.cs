@@ -97,15 +97,15 @@ namespace CompanyEmployees.Controllers
             var company = _repository.Company.GetCompany(companyId);
             if (company == null)
             {
-                _logger.LogError($"A company with the given id: {companyId} cannot be found.");
-                return NotFound($"A company with the given id: {companyId} cannot be found.");
+                _logger.LogInfo($"A company with the given id: {companyId} cannot be found.");
+                return NotFound();
             }
 
             var employee = _repository.Employee.GetEmployee(companyId, id);
             if (employee == null)
             {
-                _logger.LogError($"An employee with the given id: {id} cannot be found.");
-                return NotFound($"An employee with the given id: {id} cannot be found.");
+                _logger.LogInfo($"An employee with the given id: {id} cannot be found.");
+                return NotFound();
             }
 
             _repository.Employee.DeleteEmployee(employee);
