@@ -14,12 +14,6 @@ namespace Repositories
         {
         }
 
-        public void CreateEmployeeForCompany(Guid companyId, Employee employee) 
-        {
-            employee.CompanyID = companyId;
-            Create(employee);
-        }
-
         public Employee GetEmployee(Guid companyId, Guid employeeId, bool trackChanges = false) =>
             FindByCondition(e => e.CompanyID.Equals(companyId) && e.EmployeeID.Equals(employeeId))
             .FirstOrDefault();
@@ -27,5 +21,13 @@ namespace Repositories
         public IEnumerable<Employee> GetEmployees(Guid companyId, bool trackChanges) =>
             FindByCondition(e => e.CompanyID.Equals(companyId), trackChanges)
             .OrderBy(e => e.Name);
+
+        public void CreateEmployeeForCompany(Guid companyId, Employee employee)
+        {
+            employee.CompanyID = companyId;
+            Create(employee);
+        }
+
+        public void DeleteEmployee(Employee employee) => Delete(employee);
     }
 }
