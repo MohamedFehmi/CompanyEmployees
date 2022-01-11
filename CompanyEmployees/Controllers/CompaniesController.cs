@@ -38,12 +38,12 @@ namespace CompanyEmployees.Controllers
             return Ok(companiesDto);
         }
 
-        [HttpGet("{id}", Name ="CompanyById")]
+        [HttpGet("{id}", Name = "CompanyById")]
         public IActionResult GetCompany(Guid id)
         {
             var company = _repository.Company.GetCompany(id);
-            
-            if(company != null)
+
+            if (company != null)
             {
                 var companyDto = _mapper.Map<CompanyDTO>(company);
                 return Ok(companyDto);
@@ -54,7 +54,7 @@ namespace CompanyEmployees.Controllers
         }
 
         [HttpGet("collection/({ids})", Name = "CompanyCollection")]
-        public IActionResult GetCompanyCollection([ModelBinder(BinderType = typeof(ArrayModelBinder))]IEnumerable<Guid> ids) 
+        public IActionResult GetCompanyCollection([ModelBinder(BinderType = typeof(ArrayModelBinder))] IEnumerable<Guid> ids)
         {
             if (ids == null)
             {
@@ -129,6 +129,28 @@ namespace CompanyEmployees.Controllers
             }
 
             _repository.Company.DeleteCompany(company);
+            _repository.Save();
+
+            return NoContent();
+        }
+
+        [HttpPut("{id}")]
+        public IActionResult UpdateCompany(Guid id, [FromBody] CompanyUpdateDTO companyUpdateDTO)
+        {
+            if (companyUpdateDTO == null)
+            {
+                _logger.LogError("Data sent from the client is null");
+                return BadRequest("Data sent from the client is null");
+            }
+
+            var company = _repository.Company.GetCompany(id, trackChanges: true);
+            if (company == null)
+            {
+                _logger.LogError($"A company with the given id: {id} cannot be found.");
+                return NotFound();
+            }
+
+            _mapper.Map(companyUpdateDTO, company);
             _repository.Save();
 
             return NoContent();
