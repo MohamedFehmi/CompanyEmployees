@@ -17,6 +17,8 @@ namespace Entities.DataTransferObjects
             CreateMap<CompanyCreateDTO, Company>();
 
             CreateMap<EmployeeCreateDTO, Employee>();
+
+            CreateMap<EmployeeUpdateDTO, Employee>();
         }
     }
 }
