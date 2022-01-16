@@ -20,7 +20,7 @@ namespace Entities.DataTransferObjects
 
             CreateMap<EmployeeCreateDTO, Employee>();
 
-            CreateMap<EmployeeUpdateDTO, Employee>();
+            CreateMap<EmployeeUpdateDTO, Employee>().ReverseMap();
         }
     }
 }

@@ -3,6 +3,7 @@ using Contracts;
 using Entities.DataTransferObjects;
 using Entities.Models;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -120,7 +121,7 @@ namespace CompanyEmployees.Controllers
             if (employeeUpdateDTO == null)
             {
                 _logger.LogError("The data object 'employeeUpdateDTO' sent from the client is null.");
-                return BadRequest();    
+                return BadRequest("employeeUpdateDTO object is null");    
             }
 
             var employee = _repository.Employee.GetEmployee(companyId, id, trackChanges: true);
@@ -131,6 +132,31 @@ namespace CompanyEmployees.Controllers
             }
 
             _mapper.Map(employeeUpdateDTO, employee);
+            _repository.Save();
+
+            return NoContent();
+        }
+
+        [HttpPatch("{id}")]
+        public IActionResult PartiallyUpdateEmployeeForCompany(Guid companyId, Guid id, [FromBody] JsonPatchDocument<EmployeeUpdateDTO> patchDocument)
+        {
+            if (patchDocument == null)
+            {
+                _logger.LogError("The data object 'patchDocument' sent from the client is null.");
+                return BadRequest("patchDocument object is null");
+            }
+
+            var employee = _repository.Employee.GetEmployee(companyId, id, trackChanges: true);
+            if (employee == null)
+            {
+                _logger.LogError($"An employee with the given id: {id} cannot be found.");
+                return NotFound();
+            }
+
+            var employeeToPatch = _mapper.Map<EmployeeUpdateDTO>(employee);
+            patchDocument.ApplyTo(employeeToPatch);
+            
+            _mapper.Map(employeeToPatch, employee);
             _repository.Save();
 
             return NoContent();
