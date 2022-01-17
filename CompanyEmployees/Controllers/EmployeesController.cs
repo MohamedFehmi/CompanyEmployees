@@ -75,6 +75,12 @@ namespace CompanyEmployees.Controllers
                 return BadRequest($"Employee for company id {companyId} can not be creted because of invalid employee data.");
             }
 
+            if (!ModelState.IsValid)
+            {
+                _logger.LogError("Invalid model state for the employeeCreateDTO");
+                return UnprocessableEntity(ModelState);
+            }
+
             //check if company actually exists
             var company = _repository.Company.GetCompany(companyId);
             if (company == null)
@@ -124,6 +130,12 @@ namespace CompanyEmployees.Controllers
                 return BadRequest("employeeUpdateDTO object is null");    
             }
 
+            if (!ModelState.IsValid)
+            {
+                _logger.LogError("Invalid model state for the employeeUpdateDTO");
+                return UnprocessableEntity(ModelState);
+            }
+
             var employee = _repository.Employee.GetEmployee(companyId, id, trackChanges: true);
             if (employee == null)
             {
@@ -154,8 +166,17 @@ namespace CompanyEmployees.Controllers
             }
 
             var employeeToPatch = _mapper.Map<EmployeeUpdateDTO>(employee);
-            patchDocument.ApplyTo(employeeToPatch);
-            
+
+            patchDocument.ApplyTo(employeeToPatch, ModelState);
+
+            TryValidateModel(employeeToPatch);
+
+            if (!ModelState.IsValid)
+            {
+                _logger.LogError("Invalid model state for the patchDocument");
+                return UnprocessableEntity(ModelState);
+            }
+
             _mapper.Map(employeeToPatch, employee);
             _repository.Save();
 

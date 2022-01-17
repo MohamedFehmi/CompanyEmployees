@@ -84,6 +84,12 @@ namespace CompanyEmployees.Controllers
                 return BadRequest($"Company can not be creted because of invalid data.");
             }
 
+            if (!ModelState.IsValid)
+            {
+                _logger.LogError("Invalid model state for the companyCreateDto");
+                return UnprocessableEntity(ModelState);
+            }
+
             var company = _mapper.Map<Company>(companyCreateDto);
 
             _repository.Company.Create(company);
@@ -101,6 +107,12 @@ namespace CompanyEmployees.Controllers
             {
                 _logger.LogError("Company collection sent from the client is null.");
                 return BadRequest("Company collection is null");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                _logger.LogError("Invalid model state for the companyCreateDTOs");
+                return UnprocessableEntity(ModelState);
             }
 
             var companyEntities = _mapper.Map<IEnumerable<Company>>(companyCreateDTOs);
@@ -141,6 +153,12 @@ namespace CompanyEmployees.Controllers
             {
                 _logger.LogError("Data sent from the client is null");
                 return BadRequest("Data sent from the client is null");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                _logger.LogError("Invalid model state for the companyUpdateDTO");
+                return UnprocessableEntity(ModelState);
             }
 
             var company = _repository.Company.GetCompany(id, trackChanges: true);
