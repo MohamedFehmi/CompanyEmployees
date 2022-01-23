@@ -29,9 +29,9 @@ namespace CompanyEmployees.Controllers
         }
 
         [HttpGet]
-        public IActionResult GetCompanies()
+        public async Task<IActionResult> GetCompanies()
         {
-            var companies = _repository.Company.GetAllCompanies();
+            var companies = await _repository.Company.GetAllCompaniesAsync();
 
             var companiesDto = _mapper.Map<IEnumerable<CompanyDTO>>(companies);
 
@@ -39,9 +39,9 @@ namespace CompanyEmployees.Controllers
         }
 
         [HttpGet("{id}", Name = "CompanyById")]
-        public IActionResult GetCompany(Guid id)
+        public async Task<IActionResult> GetCompanyAsync(Guid id)
         {
-            var company = _repository.Company.GetCompany(id);
+            var company = await _repository.Company.GetCompanyAsync(id);
 
             if (company != null)
             {
@@ -54,7 +54,7 @@ namespace CompanyEmployees.Controllers
         }
 
         [HttpGet("collection/({ids})", Name = "CompanyCollection")]
-        public IActionResult GetCompanyCollection([ModelBinder(BinderType = typeof(ArrayModelBinder))] IEnumerable<Guid> ids)
+        public async Task<IActionResult> GetCompanyCollection([ModelBinder(BinderType = typeof(ArrayModelBinder))] IEnumerable<Guid> ids)
         {
             if (ids == null)
             {
@@ -62,7 +62,7 @@ namespace CompanyEmployees.Controllers
                 return BadRequest("Parameter ids is null");
             }
 
-            var companyEntities = _repository.Company.GetByIds(ids);
+            var companyEntities = await _repository.Company.GetByIdsAsync(ids);
 
             if (companyEntities.Count() != ids.Count())
             {
@@ -76,7 +76,7 @@ namespace CompanyEmployees.Controllers
         }
 
         [HttpPost]
-        public IActionResult CreateCompany([FromBody] CompanyCreateDTO companyCreateDto)
+        public async Task<IActionResult> CreateCompany([FromBody] CompanyCreateDTO companyCreateDto)
         {
             if (companyCreateDto == null)
             {
@@ -93,7 +93,7 @@ namespace CompanyEmployees.Controllers
             var company = _mapper.Map<Company>(companyCreateDto);
 
             _repository.Company.Create(company);
-            _repository.Save();
+           await _repository.SaveAsync();
 
             var companyDtoToReturn = _mapper.Map<CompanyDTO>(company);
 
@@ -101,7 +101,7 @@ namespace CompanyEmployees.Controllers
         }
 
         [HttpPost("collection")]
-        public IActionResult CreateCompaniesCollection([FromBody] IEnumerable<CompanyCreateDTO> companyCreateDTOs)
+        public async Task<IActionResult> CreateCompaniesCollection([FromBody] IEnumerable<CompanyCreateDTO> companyCreateDTOs)
         {
             if (companyCreateDTOs == null)
             {
@@ -121,7 +121,7 @@ namespace CompanyEmployees.Controllers
             {
                 _repository.Company.Create(company);
             }
-            _repository.Save();
+            await _repository.SaveAsync();
 
             var companyDTOs = _mapper.Map<IEnumerable<CompanyDTO>>(companyEntities);
 
@@ -131,9 +131,9 @@ namespace CompanyEmployees.Controllers
         }
 
         [HttpDelete("{id}")]
-        public IActionResult DeleteCompany(Guid id)
+        public async Task<IActionResult> DeleteCompany(Guid id)
         {
-            var company = _repository.Company.GetCompany(id);
+            var company = await _repository.Company.GetCompanyAsync(id);
             if (company == null)
             {
                 _logger.LogInfo($"A company with the given id: {id} cannot be found.");
@@ -141,13 +141,13 @@ namespace CompanyEmployees.Controllers
             }
 
             _repository.Company.DeleteCompany(company);
-            _repository.Save();
+            await _repository.SaveAsync();
 
             return NoContent();
         }
 
         [HttpPut("{id}")]
-        public IActionResult UpdateCompany(Guid id, [FromBody] CompanyUpdateDTO companyUpdateDTO)
+        public async Task<IActionResult> UpdateCompany(Guid id, [FromBody] CompanyUpdateDTO companyUpdateDTO)
         {
             if (companyUpdateDTO == null)
             {
@@ -161,7 +161,7 @@ namespace CompanyEmployees.Controllers
                 return UnprocessableEntity(ModelState);
             }
 
-            var company = _repository.Company.GetCompany(id, trackChanges: true);
+            var company = await _repository.Company.GetCompanyAsync(id, trackChanges: true);
             if (company == null)
             {
                 _logger.LogError($"A company with the given id: {id} cannot be found.");
@@ -169,7 +169,7 @@ namespace CompanyEmployees.Controllers
             }
 
             _mapper.Map(companyUpdateDTO, company);
-            _repository.Save();
+            await _repository.SaveAsync();
 
             return NoContent();
         }

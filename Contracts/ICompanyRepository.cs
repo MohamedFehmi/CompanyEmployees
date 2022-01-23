@@ -9,9 +9,9 @@ namespace Contracts
 {
     public interface ICompanyRepository : IRepositoryBase<Company>
     {
-        IEnumerable<Company> GetAllCompanies(bool trackChanges = false);
-        Company GetCompany(Guid companyId, bool trackChanges = false);
-        IEnumerable<Company> GetByIds(IEnumerable<Guid> ids, bool trackChanges = false);
+        Task<IEnumerable<Company>> GetAllCompaniesAsync(bool trackChanges = false);
+        Task<Company> GetCompanyAsync(Guid companyId, bool trackChanges = false);
+        Task<IEnumerable<Company>> GetByIdsAsync(IEnumerable<Guid> ids, bool trackChanges = false);
         void CreateCompany(Company company);
         void DeleteCompany(Company company);
 
