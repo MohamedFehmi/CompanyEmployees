@@ -1,10 +1,12 @@
 ﻿using AutoMapper;
+using CompanyEmployees.ActionFilters;
 using Contracts;
 using Entities.DataTransferObjects;
 using Entities.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -67,20 +69,9 @@ namespace CompanyEmployees.Controllers
         }
 
         [HttpPost]
+        [ServiceFilter(typeof(ValidationFilterAttribute))]
         public async Task<ActionResult> CreateEmployeeForCompany(Guid companyId, [FromBody] EmployeeCreateDTO employeeCreateDTO)
         {
-            if (employeeCreateDTO == null)
-            {
-                _logger.LogError($"The object employeeCreateDTO is not valid");
-                return BadRequest($"Employee for company id {companyId} can not be creted because of invalid employee data.");
-            }
-
-            if (!ModelState.IsValid)
-            {
-                _logger.LogError("Invalid model state for the employeeCreateDTO");
-                return UnprocessableEntity(ModelState);
-            }
-
             //check if company actually exists
             var company = await _repository.Company.GetCompanyAsync(companyId);
             if (company == null)
@@ -122,20 +113,9 @@ namespace CompanyEmployees.Controllers
         }
 
         [HttpPut("{id}")]
+        [ServiceFilter(typeof(ValidationFilterAttribute))]
         public async Task<IActionResult> UpdateEmployeeForCompany(Guid companyId, Guid id, [FromBody] EmployeeUpdateDTO employeeUpdateDTO)
         {
-            if (employeeUpdateDTO == null)
-            {
-                _logger.LogError("The data object 'employeeUpdateDTO' sent from the client is null.");
-                return BadRequest("employeeUpdateDTO object is null");    
-            }
-
-            if (!ModelState.IsValid)
-            {
-                _logger.LogError("Invalid model state for the employeeUpdateDTO");
-                return UnprocessableEntity(ModelState);
-            }
-
             var employee = await _repository.Employee.GetEmployeeAsync(companyId, id, trackChanges: true);
             if (employee == null)
             {

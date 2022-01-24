@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using CompanyEmployees.ActionFilters;
 using CompanyEmployees.ModelBinders;
 using Contracts;
 using Entities.DataTransferObjects;
@@ -76,20 +77,9 @@ namespace CompanyEmployees.Controllers
         }
 
         [HttpPost]
+        [ServiceFilter(typeof(ValidationFilterAttribute))]
         public async Task<IActionResult> CreateCompany([FromBody] CompanyCreateDTO companyCreateDto)
         {
-            if (companyCreateDto == null)
-            {
-                _logger.LogError($"The object companyCreateDto is not valid");
-                return BadRequest($"Company can not be creted because of invalid data.");
-            }
-
-            if (!ModelState.IsValid)
-            {
-                _logger.LogError("Invalid model state for the companyCreateDto");
-                return UnprocessableEntity(ModelState);
-            }
-
             var company = _mapper.Map<Company>(companyCreateDto);
 
             _repository.Company.Create(company);
@@ -147,20 +137,9 @@ namespace CompanyEmployees.Controllers
         }
 
         [HttpPut("{id}")]
+        [ServiceFilter(typeof(ValidationFilterAttribute))]
         public async Task<IActionResult> UpdateCompany(Guid id, [FromBody] CompanyUpdateDTO companyUpdateDTO)
         {
-            if (companyUpdateDTO == null)
-            {
-                _logger.LogError("Data sent from the client is null");
-                return BadRequest("Data sent from the client is null");
-            }
-
-            if (!ModelState.IsValid)
-            {
-                _logger.LogError("Invalid model state for the companyUpdateDTO");
-                return UnprocessableEntity(ModelState);
-            }
-
             var company = await _repository.Company.GetCompanyAsync(id, trackChanges: true);
             if (company == null)
             {
