@@ -90,21 +90,10 @@ namespace CompanyEmployees.Controllers
         }
 
         [HttpDelete("{id}")]
+        [ServiceFilter(typeof(ValidateEmployeeForCompanyExistsAttribute))]
         public async Task<IActionResult> DeleteEmployeeForCompany(Guid companyId, Guid id)
         {
-            var company = await _repository.Company.GetCompanyAsync(companyId);
-            if (company == null)
-            {
-                _logger.LogInfo($"A company with the given id: {companyId} cannot be found.");
-                return NotFound();
-            }
-
-            var employee = await _repository.Employee.GetEmployeeAsync(companyId, id);
-            if (employee == null)
-            {
-                _logger.LogInfo($"An employee with the given id: {id} cannot be found.");
-                return NotFound();
-            }
+            var employee = HttpContext.Items["employee"] as Employee;
 
             _repository.Employee.DeleteEmployee(employee);
             await _repository.SaveAsync();
@@ -114,14 +103,10 @@ namespace CompanyEmployees.Controllers
 
         [HttpPut("{id}")]
         [ServiceFilter(typeof(ValidationFilterAttribute))]
+        [ServiceFilter(typeof(ValidateEmployeeForCompanyExistsAttribute))]
         public async Task<IActionResult> UpdateEmployeeForCompany(Guid companyId, Guid id, [FromBody] EmployeeUpdateDTO employeeUpdateDTO)
         {
-            var employee = await _repository.Employee.GetEmployeeAsync(companyId, id, trackChanges: true);
-            if (employee == null)
-            {
-                _logger.LogError($"An employee with the given id: {id} cannot be found.");
-                return NotFound();
-            }
+            var employee = HttpContext.Items["employee"] as Employee;
 
             _mapper.Map(employeeUpdateDTO, employee);
             await _repository.SaveAsync();
@@ -130,6 +115,7 @@ namespace CompanyEmployees.Controllers
         }
 
         [HttpPatch("{id}")]
+        [ServiceFilter(typeof(ValidateEmployeeForCompanyExistsAttribute))]
         public async Task<IActionResult> PartiallyUpdateEmployeeForCompany(Guid companyId, Guid id, [FromBody] JsonPatchDocument<EmployeeUpdateDTO> patchDocument)
         {
             if (patchDocument == null)
@@ -138,12 +124,7 @@ namespace CompanyEmployees.Controllers
                 return BadRequest("patchDocument object is null");
             }
 
-            var employee = await _repository.Employee.GetEmployeeAsync(companyId, id, trackChanges: true);
-            if (employee == null)
-            {
-                _logger.LogError($"An employee with the given id: {id} cannot be found.");
-                return NotFound();
-            }
+            var employee = HttpContext.Items["employee"] as Employee;
 
             var employeeToPatch = _mapper.Map<EmployeeUpdateDTO>(employee);
 

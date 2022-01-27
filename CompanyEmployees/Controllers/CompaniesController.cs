@@ -121,14 +121,10 @@ namespace CompanyEmployees.Controllers
         }
 
         [HttpDelete("{id}")]
+        [ServiceFilter(typeof(ValidateCompanyExistsAttribute))]
         public async Task<IActionResult> DeleteCompany(Guid id)
         {
-            var company = await _repository.Company.GetCompanyAsync(id);
-            if (company == null)
-            {
-                _logger.LogInfo($"A company with the given id: {id} cannot be found.");
-                return NotFound();
-            }
+            var company = HttpContext.Items["company"] as Company;
 
             _repository.Company.DeleteCompany(company);
             await _repository.SaveAsync();
@@ -138,14 +134,10 @@ namespace CompanyEmployees.Controllers
 
         [HttpPut("{id}")]
         [ServiceFilter(typeof(ValidationFilterAttribute))]
+        [ServiceFilter(typeof(ValidateCompanyExistsAttribute))]
         public async Task<IActionResult> UpdateCompany(Guid id, [FromBody] CompanyUpdateDTO companyUpdateDTO)
         {
-            var company = await _repository.Company.GetCompanyAsync(id, trackChanges: true);
-            if (company == null)
-            {
-                _logger.LogError($"A company with the given id: {id} cannot be found.");
-                return NotFound();
-            }
+            var company = HttpContext.Items["company"] as Company;
 
             _mapper.Map(companyUpdateDTO, company);
             await _repository.SaveAsync();
