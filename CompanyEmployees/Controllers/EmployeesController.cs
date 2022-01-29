@@ -3,6 +3,7 @@ using CompanyEmployees.ActionFilters;
 using Contracts;
 using Entities.DataTransferObjects;
 using Entities.Models;
+using Entities.RequestFeatures;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
@@ -10,6 +11,7 @@ using Microsoft.AspNetCore.Mvc.Filters;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace CompanyEmployees.Controllers
@@ -30,7 +32,7 @@ namespace CompanyEmployees.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetEmployeesForCompany(Guid companyId)
+        public async Task<IActionResult> GetEmployeesForCompany(Guid companyId, [FromQuery] EmployeeParameters employeeParameters)
         {
             var company = await _repository.Company.GetCompanyAsync(companyId);
             if (company == null)
@@ -39,8 +41,10 @@ namespace CompanyEmployees.Controllers
                 return NotFound();
             }
 
-            var employees = await _repository.Employee.GetEmployeesAsync(companyId);
-            
+            var employees = await _repository.Employee.GetEmployeesAsync(companyId, employeeParameters);
+
+            Response.Headers.Add("X-pagination", JsonSerializer.Serialize(employees.MetaData));
+
             var employeesDto = _mapper.Map<IEnumerable<EmployeeDTO>>(employees);
 
             return Ok(employeesDto);
