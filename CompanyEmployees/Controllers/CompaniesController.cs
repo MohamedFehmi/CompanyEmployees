@@ -77,7 +77,7 @@ namespace CompanyEmployees.Controllers
         }
 
         [HttpPost]
-        [ServiceFilter(typeof(ValidationFilterAttribute))]
+        [ServiceFilter(typeof(ValidationFilterAttribute))] 
         public async Task<IActionResult> CreateCompany([FromBody] CompanyCreateDTO companyCreateDto)
         {
             var company = _mapper.Map<Company>(companyCreateDto);
