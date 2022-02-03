@@ -1,7 +1,9 @@
 using AutoMapper;
 using CompanyEmployees.ActionFilters;
 using CompanyEmployees.Extensions;
+using CompanyEmployees.Utility;
 using Contracts;
+using Entities.DataTransferObjects;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -12,6 +14,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using NLog;
+using Repositories.DataShaping;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -42,6 +45,9 @@ namespace CompanyEmployees
             services.AddScoped<ValidationFilterAttribute>();
             services.AddScoped<ValidateCompanyExistsAttribute>();
             services.AddScoped<ValidateEmployeeForCompanyExistsAttribute>();
+            services.AddScoped<ValidateMediaTypeAttribute>();
+            services.AddScoped<IDataShaper<EmployeeDTO>, DataShaper<EmployeeDTO>>();
+            services.AddScoped<EmployeeLinks>();
 
             services.Configure<ApiBehaviorOptions>(options => 
             {
@@ -54,6 +60,8 @@ namespace CompanyEmployees
                 config.ReturnHttpNotAcceptable = true;
             }).AddNewtonsoftJson() //This will replace the default System.Text.Json formatters for all JSON content
               .AddXmlDataContractSerializerFormatters();
+            
+            services.AddCustomMediaTypes();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
