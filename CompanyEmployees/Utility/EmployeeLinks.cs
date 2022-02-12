@@ -77,8 +77,9 @@ namespace CompanyEmployees.Utility
 
         private bool ShouldGenerateLinks(HttpContext httpContext)
         {
-            var mediaType = httpContext.Items["AcceptHeaderMediaType"].ToString();
-            return mediaType.Contains("hateoas", StringComparison.InvariantCultureIgnoreCase);
+            var mediaType = (MediaTypeHeaderValue)httpContext.Items["AcceptHeaderMediaType"];
+            
+            return mediaType.SubTypeWithoutSuffix.EndsWith("hateoas", StringComparison.InvariantCultureIgnoreCase);
         }
 
         private List<Entity> ShapeData(IEnumerable<EmployeeDTO> employeesDTO, string fields)
