@@ -29,7 +29,7 @@ namespace CompanyEmployees.Controllers
             _mapper = mapper;
         }
 
-        [HttpGet]
+        [HttpGet(Name = "GetCompanies")]
         public async Task<IActionResult> GetCompanies()
         {
             var companies = await _repository.Company.GetAllCompaniesAsync();
@@ -83,7 +83,7 @@ namespace CompanyEmployees.Controllers
             return Ok(companiesDto);
         }
 
-        [HttpPost]
+        [HttpPost(Name = "CreateCompany")]
         [ServiceFilter(typeof(ValidationFilterAttribute))] 
         public async Task<IActionResult> CreateCompany([FromBody] CompanyCreateDTO companyCreateDto)
         {

@@ -52,12 +52,14 @@ namespace CompanyEmployees.Extensions
                 if(newtonsoftJsonOutputFormatter != null)
                 {
                     newtonsoftJsonOutputFormatter.SupportedMediaTypes.Add("application/vnd.compemployees.hateoas+json");
+                    newtonsoftJsonOutputFormatter.SupportedMediaTypes.Add("application/vnd.compemployees.apiroot+json");
                 }
 
                 var xmlOutputFormatter = config.OutputFormatters.OfType<XmlDataContractSerializerOutputFormatter>()?.FirstOrDefault();
                 if(xmlOutputFormatter != null)
                 {
                     xmlOutputFormatter.SupportedMediaTypes.Add("application/vnd.compemployees.hateoas+xml");
+                    xmlOutputFormatter.SupportedMediaTypes.Add("application/vnd.compemployees.apiroot+xml");
                 }
             });
         }
