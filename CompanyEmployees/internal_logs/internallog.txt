@@ -15177,6 +15177,7 @@
 2022-02-03 23:31:20.1366 Trace  Scanning Property LineEnding 'Default' NLog.Targets
 2022-02-03 23:31:20.1366 Trace File Target[logfile] has 2 layouts
 2022-02-03 23:31:20.1366 Trace FileTarget(Name=logfile): Using appenderFactory: NLog.Internal.FileAppenders.RetryingMultiProcessFileAppender+Factory
+<<<<<<< HEAD
 2022-02-12 01:13:09.5145 Debug ScanAssembly('NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c')
 2022-02-12 01:13:09.6114 Debug Found assembly location directory: 'C:\Users\aloui\source\repos\CompanyEmployees\CompanyEmployees\bin\Debug\net5.0' (NLog, Version=4.0.0.0, Culture=neutral, PublicKeyToken=5120e14c03d0593c)
 2022-02-12 01:13:09.6114 Debug Auto loading based on NLog-Assembly found location: C:\Users\aloui\source\repos\CompanyEmployees\CompanyEmployees\bin\Debug\net5.0
@@ -18700,3 +18701,5 @@
 2022-02-12 19:51:41.4799 Trace  Scanning Property LineEnding 'Default' NLog.Targets
 2022-02-12 19:51:41.4799 Trace File Target[logfile] has 2 layouts
 2022-02-12 19:51:41.4799 Trace FileTarget(Name=logfile): Using appenderFactory: NLog.Internal.FileAppenders.RetryingMultiProcessFileAppender+Factory
+=======
+>>>>>>> c86bfd419cec1f4e52cccde66549f9ca1c243b15

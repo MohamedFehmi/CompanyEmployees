@@ -19,16 +19,28 @@ namespace Repositories.DataShaping
             Properties = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance);
         }
         
+<<<<<<< HEAD
         public IEnumerable<ShapedEntity> ShapeData(IEnumerable<T> entities, string fieldsString)
+=======
+        public IEnumerable<Entity> ShapeData(IEnumerable<T> entities, string fieldsString)
+>>>>>>> c86bfd419cec1f4e52cccde66549f9ca1c243b15
         {
             //Extract names of properties from QueryString
             var requiredProperties = GetRequiredProperties(fieldsString);
 
+<<<<<<< HEAD
             //Build the ShapedEntity collection
             return FetchData(entities, requiredProperties);
         }
 
         public ShapedEntity ShapeData(T entity, string fieldsString)
+=======
+            //Build the Entity collection
+            return FetchData(entities, requiredProperties);
+        }
+
+        public Entity ShapeData(T entity, string fieldsString)
+>>>>>>> c86bfd419cec1f4e52cccde66549f9ca1c243b15
         {
             var requiredProperties = GetRequiredProperties(fieldsString);
 
@@ -61,9 +73,15 @@ namespace Repositories.DataShaping
             return requiredProperties;
         }
 
+<<<<<<< HEAD
         private IEnumerable<ShapedEntity> FetchData(IEnumerable<T> entities, IEnumerable<PropertyInfo> requiredProperties)
         {
             var shapedData = new List<ShapedEntity>();
+=======
+        private IEnumerable<Entity> FetchData(IEnumerable<T> entities, IEnumerable<PropertyInfo> requiredProperties)
+        {
+            var shapedData = new List<Entity>();
+>>>>>>> c86bfd419cec1f4e52cccde66549f9ca1c243b15
 
             foreach (var entity in entities)
             {
@@ -74,13 +92,20 @@ namespace Repositories.DataShaping
             return shapedData;
         }
 
+<<<<<<< HEAD
         private ShapedEntity FetchDataForEntity(T entity, IEnumerable<PropertyInfo> requiredProperties)
         {
             var shapedObject = new ShapedEntity();
+=======
+        private Entity FetchDataForEntity(T entity, IEnumerable<PropertyInfo> requiredProperties)
+        {
+            var shapedData = new Entity();
+>>>>>>> c86bfd419cec1f4e52cccde66549f9ca1c243b15
 
             foreach (var property in requiredProperties)
             {
                 var objectPropertyValue = property.GetValue(entity);
+<<<<<<< HEAD
                 shapedObject.Entity.TryAdd(property.Name, objectPropertyValue);
             }
 
@@ -88,6 +113,12 @@ namespace Repositories.DataShaping
             shapedObject.Id = (Guid)objectProperty.GetValue(entity);
 
             return shapedObject;
+=======
+                shapedData.TryAdd(property.Name, objectPropertyValue);
+            }
+
+            return shapedData;
+>>>>>>> c86bfd419cec1f4e52cccde66549f9ca1c243b15
         }
     }
 }
