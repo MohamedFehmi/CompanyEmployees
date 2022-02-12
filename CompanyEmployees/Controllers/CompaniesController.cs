@@ -39,6 +39,13 @@ namespace CompanyEmployees.Controllers
             return Ok(companiesDto);
         }
 
+        [HttpOptions]
+        public IActionResult GetCompanyOptions() 
+        {
+            Response.Headers.Add("Allow", "GET, OPTIONS, POST");
+            return Ok();
+        }
+
         [HttpGet("{id}", Name = "CompanyById")]
         public async Task<IActionResult> GetCompanyAsync(Guid id)
         {
