@@ -1,9 +1,11 @@
-﻿using Contracts;
+﻿using CompanyEmployees.Controllers;
+using Contracts;
 using Entities.Models;
 using LoggerService;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Formatters;
+using Microsoft.AspNetCore.Mvc.Versioning;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -61,6 +63,20 @@ namespace CompanyEmployees.Extensions
                     xmlOutputFormatter.SupportedMediaTypes.Add("application/vnd.compemployees.hateoas+xml");
                     xmlOutputFormatter.SupportedMediaTypes.Add("application/vnd.compemployees.apiroot+xml");
                 }
+            });
+        }
+
+        public static void ConfigureVersioning(this IServiceCollection services)
+        {
+            services.AddApiVersioning(opt =>
+            {
+                opt.ReportApiVersions = true;
+                opt.AssumeDefaultVersionWhenUnspecified = true;
+                opt.DefaultApiVersion = new ApiVersion(1, 0);
+                opt.ApiVersionReader = new HeaderApiVersionReader("api-version");
+
+                opt.Conventions.Controller<CompaniesController>().HasApiVersion(new ApiVersion(1, 0));
+                opt.Conventions.Controller<CompaniesV2Controller>().HasDeprecatedApiVersion(new ApiVersion(2, 0));
             });
         }
     }
