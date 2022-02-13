@@ -1,3 +1,4 @@
+using AspNetCoreRateLimit;
 using AutoMapper;
 using CompanyEmployees.ActionFilters;
 using CompanyEmployees.Extensions;
@@ -45,6 +46,10 @@ namespace CompanyEmployees
             services.ConfigureResponseCaching();
             services.ConfigureHttpCacheHeaders();
 
+            services.AddMemoryCache();
+            services.ConfigureRateLimitingOptions();
+            services.AddHttpContextAccessor();
+
             services.AddAutoMapper(typeof(Startup));
             services.AddScoped<ValidationFilterAttribute>();
             services.AddScoped<ValidateCompanyExistsAttribute>();
@@ -89,7 +94,9 @@ namespace CompanyEmployees
 
             //Forward proxy headers to the current request (helps during application deployment)
             app.UseForwardedHeaders(new ForwardedHeadersOptions { ForwardedHeaders = ForwardedHeaders.All });
-            
+
+            app.UseIpRateLimiting();
+
             app.UseRouting();
             app.UseCors("CorsPolicy");
             app.UseResponseCaching();
