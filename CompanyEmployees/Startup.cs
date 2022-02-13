@@ -42,6 +42,8 @@ namespace CompanyEmployees
             services.ConfigureSqlContext(Configuration);
             services.ConfigureRepositoryManager();
             services.ConfigureVersioning();
+            services.ConfigureResponseCaching();
+            services.ConfigureHttpCacheHeaders();
 
             services.AddAutoMapper(typeof(Startup));
             services.AddScoped<ValidationFilterAttribute>();
@@ -60,6 +62,7 @@ namespace CompanyEmployees
             {
                 config.RespectBrowserAcceptHeader = true;
                 config.ReturnHttpNotAcceptable = true;
+                config.CacheProfiles.Add("120SecondsDuration", new CacheProfile { Duration = 120 });
             }).AddNewtonsoftJson() //This will replace the default System.Text.Json formatters for all JSON content
               .AddXmlDataContractSerializerFormatters();
             
@@ -89,6 +92,8 @@ namespace CompanyEmployees
             
             app.UseRouting();
             app.UseCors("CorsPolicy");
+            app.UseResponseCaching();
+            app.UseHttpCacheHeaders();
 
             app.UseAuthorization();
 

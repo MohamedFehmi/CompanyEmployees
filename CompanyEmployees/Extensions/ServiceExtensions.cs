@@ -2,6 +2,7 @@
 using Contracts;
 using Entities.Models;
 using LoggerService;
+using Marvin.Cache.Headers;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Formatters;
@@ -19,7 +20,7 @@ namespace CompanyEmployees.Extensions
 {
     public static class ServiceExtensions
     {
-        public static void ConfigureCors(this IServiceCollection services) => 
+        public static void ConfigureCors(this IServiceCollection services) =>
             services.AddCors(options =>
             {
                 options.AddPolicy("CorsPolicy", builder =>
@@ -29,18 +30,18 @@ namespace CompanyEmployees.Extensions
             });
 
         //Hosting in IIS will require an integration that helps in deployments
-        public static void ConfigureIISIntegration(this IServiceCollection services) => 
-            services.Configure<IISOptions>(options => 
+        public static void ConfigureIISIntegration(this IServiceCollection services) =>
+            services.Configure<IISOptions>(options =>
             {
                 //Default values, for properties inside options, are fine for now
             });
 
-        public static void ConfigureLoggerService(this IServiceCollection services) => 
+        public static void ConfigureLoggerService(this IServiceCollection services) =>
             services.AddScoped<ILoggerManager, LoggerManager>();
 
         public static void ConfigureSqlContext(this IServiceCollection services, IConfiguration configuration) =>
             services.AddDbContext<RepositoryContext>(opts =>
-                opts.UseSqlServer(configuration.GetConnectionString("sqlConnection"), mig => 
+                opts.UseSqlServer(configuration.GetConnectionString("sqlConnection"), mig =>
                     mig.MigrationsAssembly("CompanyEmployees")));
 
         public static void ConfigureRepositoryManager(this IServiceCollection services) =>
@@ -51,14 +52,14 @@ namespace CompanyEmployees.Extensions
             services.Configure<MvcOptions>(config =>
             {
                 var newtonsoftJsonOutputFormatter = config.OutputFormatters.OfType<NewtonsoftJsonOutputFormatter>()?.FirstOrDefault();
-                if(newtonsoftJsonOutputFormatter != null)
+                if (newtonsoftJsonOutputFormatter != null)
                 {
                     newtonsoftJsonOutputFormatter.SupportedMediaTypes.Add("application/vnd.compemployees.hateoas+json");
                     newtonsoftJsonOutputFormatter.SupportedMediaTypes.Add("application/vnd.compemployees.apiroot+json");
                 }
 
                 var xmlOutputFormatter = config.OutputFormatters.OfType<XmlDataContractSerializerOutputFormatter>()?.FirstOrDefault();
-                if(xmlOutputFormatter != null)
+                if (xmlOutputFormatter != null)
                 {
                     xmlOutputFormatter.SupportedMediaTypes.Add("application/vnd.compemployees.hateoas+xml");
                     xmlOutputFormatter.SupportedMediaTypes.Add("application/vnd.compemployees.apiroot+xml");
@@ -79,5 +80,20 @@ namespace CompanyEmployees.Extensions
                 opt.Conventions.Controller<CompaniesV2Controller>().HasDeprecatedApiVersion(new ApiVersion(2, 0));
             });
         }
+
+        public static void ConfigureResponseCaching(this IServiceCollection services) =>
+            services.AddResponseCaching();
+
+        public static void ConfigureHttpCacheHeaders(this IServiceCollection services) =>
+            services.AddHttpCacheHeaders
+            ((expirationOpt) =>
+             {
+                 expirationOpt.MaxAge = 65;
+                 expirationOpt.CacheLocation = CacheLocation.Private;
+             },
+             (validationOpt) =>
+             {
+                 validationOpt.MustRevalidate = true;
+            });
     }
 }
