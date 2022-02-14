@@ -50,11 +50,16 @@ namespace CompanyEmployees
             services.ConfigureRateLimitingOptions();
             services.AddHttpContextAccessor();
 
+            services.AddAuthentication();
+            services.ConfigureIdentity();
+
             services.AddAutoMapper(typeof(Startup));
+
             services.AddScoped<ValidationFilterAttribute>();
             services.AddScoped<ValidateCompanyExistsAttribute>();
             services.AddScoped<ValidateEmployeeForCompanyExistsAttribute>();
             services.AddScoped<ValidateMediaTypeAttribute>();
+            
             services.AddScoped<IDataShaper<EmployeeDTO>, DataShaper<EmployeeDTO>>();
             services.AddScoped<EmployeeLinks>();
 
@@ -102,6 +107,7 @@ namespace CompanyEmployees
             app.UseResponseCaching();
             app.UseHttpCacheHeaders();
 
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
