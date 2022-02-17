@@ -5,6 +5,7 @@ using Contracts;
 using Entities.DataTransferObjects;
 using Entities.Models;
 using Marvin.Cache.Headers;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -31,7 +32,7 @@ namespace CompanyEmployees.Controllers
             _mapper = mapper;
         }
 
-        [HttpGet(Name = "GetCompanies")]
+        [HttpGet(Name = "GetCompanies"), Authorize]
         public async Task<IActionResult> GetCompanies()
         {
             var companies = await _repository.Company.GetAllCompaniesAsync();
@@ -48,7 +49,7 @@ namespace CompanyEmployees.Controllers
             return Ok();
         }
 
-        [HttpGet("{id}", Name = "CompanyById")]
+        [HttpGet("{id}", Name = "CompanyById"), Authorize]
         [HttpCacheExpiration(CacheLocation = CacheLocation.Public, MaxAge = 60)]
         [HttpCacheValidation(MustRevalidate = false)]
         public async Task<IActionResult> GetCompanyAsync(Guid id)
@@ -65,7 +66,7 @@ namespace CompanyEmployees.Controllers
             return NotFound();
         }
 
-        [HttpGet("collection/({ids})", Name = "CompanyCollection")]
+        [HttpGet("collection/({ids})", Name = "CompanyCollection"), Authorize]
         public async Task<IActionResult> GetCompanyCollection([ModelBinder(BinderType = typeof(ArrayModelBinder))] IEnumerable<Guid> ids)
         {
             if (ids == null)
@@ -87,7 +88,7 @@ namespace CompanyEmployees.Controllers
             return Ok(companiesDto);
         }
 
-        [HttpPost(Name = "CreateCompany")]
+        [HttpPost(Name = "CreateCompany"), Authorize]
         [ServiceFilter(typeof(ValidationFilterAttribute))] 
         public async Task<IActionResult> CreateCompany([FromBody] CompanyCreateDTO companyCreateDto)
         {
@@ -101,7 +102,7 @@ namespace CompanyEmployees.Controllers
             return CreatedAtRoute("CompanyById", new { id = companyDtoToReturn.CompanyID }, companyDtoToReturn);
         }
 
-        [HttpPost("collection")]
+        [HttpPost("collection"), Authorize]
         public async Task<IActionResult> CreateCompaniesCollection([FromBody] IEnumerable<CompanyCreateDTO> companyCreateDTOs)
         {
             if (companyCreateDTOs == null)
@@ -131,7 +132,7 @@ namespace CompanyEmployees.Controllers
             return CreatedAtRoute("CompanyCollection", new { ids }, companyDTOs);
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete("{id}"), Authorize]
         [ServiceFilter(typeof(ValidateCompanyExistsAttribute))]
         public async Task<IActionResult> DeleteCompany(Guid id)
         {
@@ -143,7 +144,7 @@ namespace CompanyEmployees.Controllers
             return NoContent();
         }
 
-        [HttpPut("{id}")]
+        [HttpPut("{id}"), Authorize]
         [ServiceFilter(typeof(ValidationFilterAttribute))]
         [ServiceFilter(typeof(ValidateCompanyExistsAttribute))]
         public async Task<IActionResult> UpdateCompany(Guid id, [FromBody] CompanyUpdateDTO companyUpdateDTO)

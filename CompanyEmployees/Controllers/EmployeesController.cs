@@ -5,6 +5,7 @@ using Contracts;
 using Entities.DataTransferObjects;
 using Entities.Models;
 using Entities.RequestFeatures;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.JsonPatch;
 using Microsoft.AspNetCore.Mvc;
@@ -34,7 +35,7 @@ namespace CompanyEmployees.Controllers
             _employeeLinks = employeeLinks;
         }
 
-        [HttpGet]
+        [HttpGet, Authorize]
         [HttpHead]
         [ServiceFilter(typeof(ValidateMediaTypeAttribute))]
         public async Task<IActionResult> GetEmployeesForCompany(Guid companyId, [FromQuery] EmployeeParameters employeeParameters)
@@ -59,7 +60,7 @@ namespace CompanyEmployees.Controllers
             return links.HasLinks ? Ok(links.LinkedEntities) : Ok(links.ShapedEntities);
         }
 
-        [HttpGet("{id}", Name = "GetEmployeeForCompany")]
+        [HttpGet("{id}", Name = "GetEmployeeForCompany"), Authorize]
         public async Task<IActionResult> GetEmployeeForCompany(Guid companyId, Guid id)
         {
             var company = await _repository.Company.GetCompanyAsync(companyId);
@@ -81,7 +82,7 @@ namespace CompanyEmployees.Controllers
             return Ok(employeeDto);
         }
 
-        [HttpPost]
+        [HttpPost, Authorize]
         [ServiceFilter(typeof(ValidationFilterAttribute))]
         public async Task<ActionResult> CreateEmployeeForCompany(Guid companyId, [FromBody] EmployeeCreateDTO employeeCreateDTO)
         {
@@ -102,7 +103,7 @@ namespace CompanyEmployees.Controllers
             return CreatedAtRoute("GetEmployeeForCompany", new { companyId, id = employeeToReturnDto.EmployeeID }, employeeToReturnDto);
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete("{id}"), Authorize]
         [ServiceFilter(typeof(ValidateEmployeeForCompanyExistsAttribute))]
         public async Task<IActionResult> DeleteEmployeeForCompany(Guid companyId, Guid id)
         {
@@ -114,7 +115,7 @@ namespace CompanyEmployees.Controllers
             return NoContent();
         }
 
-        [HttpPut("{id}")]
+        [HttpPut("{id}"), Authorize]
         [ServiceFilter(typeof(ValidationFilterAttribute))]
         [ServiceFilter(typeof(ValidateEmployeeForCompanyExistsAttribute))]
         public async Task<IActionResult> UpdateEmployeeForCompany(Guid companyId, Guid id, [FromBody] EmployeeUpdateDTO employeeUpdateDTO)
@@ -127,7 +128,7 @@ namespace CompanyEmployees.Controllers
             return NoContent();
         }
 
-        [HttpPatch("{id}")]
+        [HttpPatch("{id}"), Authorize]
         [ServiceFilter(typeof(ValidateEmployeeForCompanyExistsAttribute))]
         public async Task<IActionResult> PartiallyUpdateEmployeeForCompany(Guid companyId, Guid id, [FromBody] JsonPatchDocument<EmployeeUpdateDTO> patchDocument)
         {
