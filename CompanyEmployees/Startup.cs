@@ -64,6 +64,8 @@ namespace CompanyEmployees
             services.AddScoped<IDataShaper<EmployeeDTO>, DataShaper<EmployeeDTO>>();
             services.AddScoped<EmployeeLinks>();
 
+            services.AddScoped<IAuthenticationManager, AuthenticationManager>();
+
             services.Configure<ApiBehaviorOptions>(options => 
             {
                 options.SuppressModelStateInvalidFilter = true;
