@@ -32,7 +32,7 @@ namespace CompanyEmployees.Controllers
             _mapper = mapper;
         }
 
-        [HttpGet(Name = "GetCompanies"), Authorize(Roles = "Manager")]
+        [HttpGet(Name = "GetCompanies"), Authorize]
         public async Task<IActionResult> GetCompanies()
         {
             var companies = await _repository.Company.GetAllCompaniesAsync();
@@ -66,7 +66,7 @@ namespace CompanyEmployees.Controllers
             return NotFound();
         }
 
-        [HttpGet("collection/({ids})", Name = "CompanyCollection"), Authorize(Roles = "Manager")]
+        [HttpGet("collection/({ids})", Name = "CompanyCollection"), Authorize]
         public async Task<IActionResult> GetCompanyCollection([ModelBinder(BinderType = typeof(ArrayModelBinder))] IEnumerable<Guid> ids)
         {
             if (ids == null)
@@ -88,7 +88,7 @@ namespace CompanyEmployees.Controllers
             return Ok(companiesDto);
         }
 
-        [HttpPost(Name = "CreateCompany"), Authorize(Roles = "Manager")]
+        [HttpPost(Name = "CreateCompany"), Authorize]
         [ServiceFilter(typeof(ValidationFilterAttribute))] 
         public async Task<IActionResult> CreateCompany([FromBody] CompanyCreateDTO companyCreateDto)
         {
@@ -102,7 +102,7 @@ namespace CompanyEmployees.Controllers
             return CreatedAtRoute("CompanyById", new { id = companyDtoToReturn.CompanyID }, companyDtoToReturn);
         }
 
-        [HttpPost("collection"), Authorize(Roles = "Manager")]
+        [HttpPost("collection"), Authorize]
         public async Task<IActionResult> CreateCompaniesCollection([FromBody] IEnumerable<CompanyCreateDTO> companyCreateDTOs)
         {
             if (companyCreateDTOs == null)
@@ -132,7 +132,7 @@ namespace CompanyEmployees.Controllers
             return CreatedAtRoute("CompanyCollection", new { ids }, companyDTOs);
         }
 
-        [HttpDelete("{id}"), Authorize(Roles = "Manager")]
+        [HttpDelete("{id}"), Authorize]
         [ServiceFilter(typeof(ValidateCompanyExistsAttribute))]
         public async Task<IActionResult> DeleteCompany(Guid id)
         {
@@ -144,7 +144,7 @@ namespace CompanyEmployees.Controllers
             return NoContent();
         }
 
-        [HttpPut("{id}"), Authorize(Roles = "Manager")]
+        [HttpPut("{id}"), Authorize]
         [ServiceFilter(typeof(ValidationFilterAttribute))]
         [ServiceFilter(typeof(ValidateCompanyExistsAttribute))]
         public async Task<IActionResult> UpdateCompany(Guid id, [FromBody] CompanyUpdateDTO companyUpdateDTO)

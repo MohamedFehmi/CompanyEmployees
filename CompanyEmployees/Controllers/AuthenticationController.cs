@@ -3,6 +3,7 @@ using CompanyEmployees.ActionFilters;
 using Contracts;
 using Entities.DataTransferObjects;
 using Entities.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -61,8 +62,40 @@ namespace CompanyEmployees.Controllers
                 _logger.LogError($"{nameof(LoginUser)}: Authentication failed. Wrong username or password");
                 return Unauthorized();
             }
-
-            return Ok(new { Token = await _authManager.CreateToken() });
+            
+            return Ok(new { Token = await _authManager.CreateToken(), RefreshToken = await _authManager.CreateRefreshToken(true) });
         }
+
+        [HttpPost("refresh")]
+        [ServiceFilter(typeof(ValidationFilterAttribute))]
+        public async Task<IActionResult> RefreshUserToken([FromBody] UserForAuthenticationDTO userForAuthenticationDTO)
+        {
+            string accessToken = userForAuthenticationDTO.AccessToken;
+            string refreshToken = userForAuthenticationDTO.RefreshToken;
+
+            var principal = _authManager.GetPrincipalFromExpiredToken(accessToken);
+            var username = principal.Identity.Name;
+
+            if (!await _authManager.ValidateUser(username, refreshToken))
+            {
+                _logger.LogError($"{nameof(RefreshUserToken)}: Refreshing the json web token has failed.");
+                return BadRequest("Invalid client request.");
+            }
+
+            var newAccessToken = await _authManager.CreateToken();
+            var newRefreshToken = await _authManager.CreateRefreshToken();
+
+            return Ok(new { Token = newAccessToken, RefreshToken = newRefreshToken});
+        }
+
+        [HttpPost("revoke"), Authorize]
+        public async Task<IActionResult> Revoke([FromBody] UserForAuthenticationDTO userForAuthenticationDTO)
+        {
+            if (!await _authManager.RevokeRefreshToken(userForAuthenticationDTO))
+                return BadRequest();
+
+            return NoContent();
+        }
+
     }
 }

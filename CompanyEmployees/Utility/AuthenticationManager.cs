@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -33,6 +34,12 @@ namespace CompanyEmployees.Utility
             return (_user != null && await _userManager.CheckPasswordAsync(_user, userForAuthenticationDTO.Password));
         }
 
+        public async Task<bool> ValidateUser(string username, string refreshToken)
+        {
+            _user = await _userManager.FindByNameAsync(username);
+            return (_user != null && _user.RefreshToken == refreshToken && _user.RefreshTokenExpiryTime > DateTime.Now);
+        }
+
         public async Task<string> CreateToken()
         {
             var signingCrednetials = GetSigningCredentials();//Create the Signature
@@ -40,6 +47,48 @@ namespace CompanyEmployees.Utility
             var tokenOptions = GenerateTokenOptions(signingCrednetials, claims);
 
             return new JwtSecurityTokenHandler().WriteToken(tokenOptions);
+        }
+
+        public async Task<string> CreateRefreshToken(bool saveUserTokenExpiryDate)
+        {
+            //Create refresh token
+            var randomNumber = new byte[32];
+            using (var rng = RandomNumberGenerator.Create())
+            {
+                rng.GetBytes(randomNumber);
+                
+                var refreshToken = Convert.ToBase64String(randomNumber);
+
+                //set the user refresh token and expiry and save changes
+                _user.RefreshToken = refreshToken;
+                if(saveUserTokenExpiryDate) _user.RefreshTokenExpiryTime = DateTime.Now.AddDays(7);
+                
+                await _userManager.UpdateAsync(_user);
+
+                return refreshToken;
+            }
+        }
+
+        public ClaimsPrincipal GetPrincipalFromExpiredToken(string token) 
+        {
+            var tokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateAudience = false, //Validate the audience and issuer depending on the use case
+                ValidateIssuer = false,
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("SECRET"))),
+                ValidateLifetime = false //for now we don't care about the token's expiration date
+            };
+
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out SecurityToken securityToken);
+
+            //Validate the token 
+            var jwtSecurityToken = securityToken as JwtSecurityToken;
+            if (jwtSecurityToken == null || !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
+                throw new SecurityTokenException("Invalid token");
+
+            return principal;
         }
 
         private SigningCredentials GetSigningCredentials()
@@ -82,6 +131,17 @@ namespace CompanyEmployees.Utility
             );
 
             return tokenOptions;
+        }
+
+        public async Task<bool> RevokeRefreshToken(UserForAuthenticationDTO userForAuthenticationDTO)
+        {
+            _user = await _userManager.FindByNameAsync(userForAuthenticationDTO.UserName);
+            if (_user is null) return false;
+
+            _user.RefreshToken = null;
+            await _userManager.UpdateAsync(_user);
+
+            return true;
         }
     }
 }

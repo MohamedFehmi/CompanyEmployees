@@ -14,5 +14,8 @@ namespace Entities.DataTransferObjects
 
         [Required(ErrorMessage = "Password is required")]
         public string Password { get; set; }
+
+        public string AccessToken { get; set; }
+        public string RefreshToken { get; set; }
     }
 }
