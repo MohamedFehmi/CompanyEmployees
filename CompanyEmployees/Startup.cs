@@ -66,6 +66,8 @@ namespace CompanyEmployees
 
             services.AddScoped<IAuthenticationManager, AuthenticationManager>();
 
+            services.ConfigureSwagger();
+
             services.Configure<ApiBehaviorOptions>(options => 
             {
                 options.SuppressModelStateInvalidFilter = true;
@@ -109,6 +111,13 @@ namespace CompanyEmployees
             app.UseCors("CorsPolicy");
             app.UseResponseCaching();
             app.UseHttpCacheHeaders();
+
+            app.UseSwagger();
+            app.UseSwaggerUI(s => 
+            {
+                s.SwaggerEndpoint("/swagger/v1/swagger.json", "CompanyEmployees API v1");
+                s.SwaggerEndpoint("/swagger/v2/swagger.json", "CompanyEmployees API v2");
+            });
 
             app.UseAuthentication();
             app.UseAuthorization();
